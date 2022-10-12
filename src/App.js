@@ -1,6 +1,31 @@
-
+/** @jsxImportSource @emotion/react */
 import './App.css';
 import React, { useState } from 'react';
+import {css} from '@emotion/react';
+
+const KanbanBoard = ({ children }) => (
+  <main
+    css={css`
+      flex: 10;
+      display: flex;
+      flex-direction: row;
+      gap: 1rem;
+      margin: 0 1rem 1rem;
+    `}
+  >
+    {children}
+  </main>
+);
+
+const KanbanColumn =({children, className, title}) => {
+  const combinedClassName =`kanban-column ${className}`;
+  return (
+    <section className={combinedClassName}>
+      <h2>{title}</h2>
+      <ul>{children}</ul>
+    </section>
+  )
+}
 
 const KanbanCard = ({ title, status }) => {
   return (
@@ -59,38 +84,36 @@ function App() {
     <div className="App">
       <header className="App-header">
         <h1>TASKS BOARD</h1>
-        <img src='./logo300.png' className="App-logo" alt="logo" />
+        <img src="./logo300.png" className="App-logo" alt="logo" />
       </header>
-      <main className="kanban-board">
-        <section className="kanban-column column-todo">
-          <h2>
-            To Do 
-            <button onClick={handleAdd} disabled={showAdd}>Add a new card</button>
-          </h2>
-          <ul>
-            {showAdd && <KanbanNewCard onSubmit={handleSubmit}/>}
-            {todoList.map((props) => (
-              <KanbanCard {...props} />
-            ))}
-          </ul>
-        </section>
-        <section className="kanban-column column-ongoing">
-          <h2>Ongoing</h2>
-          <ul>
-            {ongoingList.map((props) => (
-              <KanbanCard {...props} />
-            ))}
-          </ul>
-        </section>
-        <section className="kanban-column column-done">
-          <h2>Done</h2>
-          <ul>
-            {doneList.map((props) => (
-              <KanbanCard {...props} />
-            ))}
-          </ul>
-        </section>
-      </main>
+      <KanbanBoard>
+        <KanbanColumn
+          className="column-todo"
+          title={
+            <>
+              To Do
+              <button onClick={handleAdd} disabled={showAdd}>
+                Add a new card
+              </button>
+            </>
+          }
+        >
+          {showAdd && <KanbanNewCard onSubmit={handleSubmit} />}
+          {todoList.map((props) => (
+            <KanbanCard key={props.title} {...props} />
+          ))}
+        </KanbanColumn>
+        <KanbanColumn className="column-ongoing" title="Ongoing">
+          {ongoingList.map((props) => (
+            <KanbanCard key={props.title} {...props} />
+          ))}
+        </KanbanColumn>
+        <KanbanColumn className="column-done" title="Done">
+          {doneList.map((props) => (
+            <KanbanCard key={props.title} {...props} />
+          ))}
+        </KanbanColumn>
+      </KanbanBoard>
     </div>
   );
 }
