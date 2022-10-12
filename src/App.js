@@ -1,7 +1,6 @@
-import logo from './logo.svg';
+
 import './App.css';
 import React, { useState } from 'react';
-
 
 const KanbanCard = ({ title, status }) => {
   return (
@@ -59,8 +58,8 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>Tasks Board</h1>
-        <img src={logo} className="App-logo" alt="logo" />
+        <h1>TASKS BOARD</h1>
+        <img src='./logo300.png' className="App-logo" alt="logo" />
       </header>
       <main className="kanban-board">
         <section className="kanban-column column-todo">
