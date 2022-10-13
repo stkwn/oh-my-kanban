@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import './App.css';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {css} from '@emotion/react';
 
 
@@ -128,6 +128,10 @@ const KanbanCard = ({ title, status }) => {
 };
 const KanbanNewCard = ({onSubmit}) => {
   const [title, setTitle] = useState('');
+  const inputElem = useRef(null);
+  useEffect(()=>{
+    inputElem.current.focus()
+  },[])
   const handleChange = e => setTitle(e.target.value);
   const handleKeyDown = e =>{
     if (e.key ==='Enter') {
@@ -138,20 +142,23 @@ const KanbanNewCard = ({onSubmit}) => {
     <li css={kanbanCardStyles}>
       <h3>Add a new task</h3>
       <div css={kanbanCardTitleStyles}>
-        <input type="text" value={title} onChange={handleChange} onKeyDown={handleKeyDown}/>
+        <input type="text" value={title} ref={inputElem} onChange={handleChange} onKeyDown={handleKeyDown}/>
       </div>
     </li>
   );
 };
 const COLUMN_BG_COLORS = {
+  loading: "#E3E3E3",
   todo: "#C9AF97;",
   ongoing: " #FFE799",
   done: "#C0E8BA",
 };
 
+const DATA_STORE_KEY = 'kanban-data-store';
 
 function App() {
   const [showAdd, setShowAdd] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [todoList, setTodoList] = useState([
     { title: "TodoList 1", status: "2022-05-22 18:15" },
     { title: "TodoList 3", status: "2022-05-22 18:17" },
@@ -168,6 +175,19 @@ function App() {
   { title: "TodoList 10", status: "2022-05-22 18:15" },
   ]);
 
+  useEffect(() => {
+  const data = window.localStorage.getItem(DATA_STORE_KEY);
+  setTimeout(() => {
+    if (data) {
+      const kanbanColumnData = JSON.parse(data);
+      setTodoList(kanbanColumnData.todoList);
+      setOngoingList(kanbanColumnData.ongoingList);
+      setDoneList(kanbanColumnData.doneList);
+    }
+    setIsLoading(false);
+  }, 3000);
+}, []);  
+
   const handleAdd = (evt => setShowAdd(true));
   const handleSubmit = (title) => {
     setTodoList((currentTodoList) => [
@@ -176,14 +196,24 @@ function App() {
     ]);
     setShowAdd(false)
   }
+  const handleSaveAll = () => {
+    const data = JSON.stringify({ todoList, ongoingList, doneList });
+    window.localStorage.setItem(DATA_STORE_KEY, data);
+  };
 
   return (
     <div className="App">
       <header className="App-header">
-        <h1>TASKS BOARD</h1>
+        <h1>
+          TASKS BOARD
+          <button onClick={handleSaveAll}>Save all tasks</button>
+        </h1>
         <img src="./logo300.png" className="App-logo" alt="logo" />
       </header>
       <KanbanBoard>
+        {isLoading ?(
+          <KanbanColumn title="Is Loading..." bgColor={COLUMN_BG_COLORS.loading} />) :
+        (<>
         <KanbanColumn
           bgColor={COLUMN_BG_COLORS.todo}
           title={
@@ -194,22 +224,23 @@ function App() {
               </button>
             </>
           }
-        >
+          >
           {showAdd && <KanbanNewCard onSubmit={handleSubmit} />}
           {todoList.map((props) => (
             <KanbanCard key={props.title} {...props} />
-          ))}
+            ))}
         </KanbanColumn>
         <KanbanColumn bgColor={COLUMN_BG_COLORS.ongoing} title="Ongoing">
           {ongoingList.map((props) => (
             <KanbanCard key={props.title} {...props} />
-          ))}
+            ))}
         </KanbanColumn>
         <KanbanColumn bgColor={COLUMN_BG_COLORS.done} title="Done">
           {doneList.map((props) => (
             <KanbanCard key={props.title} {...props} />
-          ))}
+            ))}
         </KanbanColumn>
+        </>)}
       </KanbanBoard>
     </div>
   );
