@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import './App.css';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {css} from '@emotion/react';
 
 
@@ -84,18 +84,44 @@ const kanbanCardTitleStyles = css`
   }
 `;
 
+const MINUTE = 60 * 1000;
+const HOUR = 60 * MINUTE;
+const DAY = 24 * HOUR;
+const UPDATE_INTERVAL = MINUTE;
+
 const KanbanCard = ({ title, status }) => {
+  const [displayTime,setDisplayTime] = useState(null);
+    useEffect(() => {
+      const updateDisplayTime = () => {
+        const timePassed = new Date() - new Date(status);
+        let relativeTime = "Just Now";
+        if (MINUTE <= timePassed && timePassed < HOUR) {
+          relativeTime = `${Math.ceil(timePassed / MINUTE)} minutes ago`;
+        } else if (HOUR <= timePassed && timePassed < DAY) {
+          relativeTime = `${Math.ceil(timePassed / HOUR)} hours ago`;
+        } else if (DAY <= timePassed) {
+          relativeTime = `${Math.ceil(timePassed / DAY)} days ago`;
+        }
+        setDisplayTime(relativeTime);
+      };
+      const intervalId = setInterval(updateDisplayTime, UPDATE_INTERVAL);
+      updateDisplayTime();
+      return function cleanup() {
+        clearInterval(intervalId);
+      };
+    }, [status]);
   return (
     <li css={kanbanCardStyles}>
-      <div css={kanbanCardTitleStyles}>{title}</div>
+      <div css={kanbanCardTitleStyles} >{title}</div>
       <div
         css={css`
           text-align: right;
           font-size: 0.8rem;
           color: #333;
         `}
+        title ={status}
       >
-        {status}
+        {displayTime}
       </div>
     </li>
   );
@@ -127,28 +153,28 @@ const COLUMN_BG_COLORS = {
 function App() {
   const [showAdd, setShowAdd] = useState(false);
   const [todoList, setTodoList] = useState([
-    { title: "TodoList 1", status: "22-05-22 18:15" },
-    { title: "TodoList 3", status: "23-05-22 18:17" },
-    { title: "TodoList 5", status: "23-05-22 18:18" },
-    { title: "TodoList 7", status: "23-05-22 18:19" },
+    { title: "TodoList 1", status: "2022-05-22 18:15" },
+    { title: "TodoList 3", status: "2022-05-22 18:17" },
+    { title: "TodoList 5", status: "2022-05-22 18:18" },
+    { title: "TodoList 7", status: "2022-05-22 18:19" },
   ]);
   const [ongoingList, setOngoingList] = useState([
-    { title: "TodoList 4", status: "22-05-22 18:15" },
-    { title: "TodoList 6", status: "22-05-22 18:15" },
-    { title: "TodoList 2", status: "22-05-22 18:15" },
+    { title: "TodoList 4", status: "2022-05-22 18:15" },
+    { title: "TodoList 6", status: "2022-05-22 18:15" },
+    { title: "TodoList 2", status: "2022-05-22 18:15" },
   ]);
   const [doneList, setDoneList] = useState( [
-  { title: "TodoList 0", status: "22-05-22 18:15" },
-  { title: "TodoList 10", status: "22-05-22 18:15" },
+  { title: "TodoList 0", status: "2022-05-22 18:15" },
+  { title: "TodoList 10", status: "2022-05-22 18:15" },
   ]);
 
   const handleAdd = (evt => setShowAdd(true));
   const handleSubmit = (title) => {
     setTodoList((currentTodoList) => [
-      { title, status: new Date().toDateString() },
+      { title, status: new Date().toString() },
       ...currentTodoList
     ]);
-    // setShowAdd(false)
+    setShowAdd(false)
   }
 
   return (
