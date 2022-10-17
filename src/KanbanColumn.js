@@ -50,8 +50,8 @@ export default function KanbanColumn({
 }) {
   const [showAdd, setShowAdd] = useState(false);
   const handleAdd = (evt) => setShowAdd(true);
-  const handleSubmit = (title) => {
-      onAdd && onAdd(title)
+  const handleSubmit = (newCard) => {
+      onAdd && onAdd(newCard)
       setShowAdd(false);
     };
 

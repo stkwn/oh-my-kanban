@@ -46,9 +46,9 @@ const handleSaveAll = () => {
   window.localStorage.setItem(DATA_STORE_KEY, data);
 };
 
-  const handleSubmit = (title) => {
+  const handleAdd = (newCard) => {
     setTodoList((currentTodoList) => [
-      { title, status: new Date().toLocaleString() },
+      newCard,
       ...currentTodoList
     ]);
   }
@@ -92,7 +92,7 @@ const handleSaveAll = () => {
             <KanbanColumn
               canAddNew
               bgColor={COLUMN_BG_COLORS.todo}
-              title="Handling"
+              title="Todo"
               setDraggedItem={setDraggedItem}
               setIsDragSource={(isSrc) =>
                 setDragSource(isSrc ? COLUMN_KEY_TODO : null)
@@ -100,7 +100,7 @@ const handleSaveAll = () => {
               setIsDragTarget={(isTgt) =>
                 setDragTarget(isTgt ? COLUMN_KEY_TODO : null)
               }
-              onAdd={handleSubmit}
+              onAdd={handleAdd}
               onDrop={handleDrop}
               cardList={todoList}
             />

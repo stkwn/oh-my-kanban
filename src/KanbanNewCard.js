@@ -12,7 +12,8 @@ export default function KanbanNewCard({ onSubmit }) {
   const handleChange = (e) => setTitle(e.target.value);
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
-      onSubmit(title);
+      const newCard ={title, status: new Date().toLocaleString()}
+      onSubmit(newCard);
     }
   };
   return (
